@@ -15,9 +15,7 @@ async function waitAsync(ms: number) {
 }
 
 export const getQueue = async (): Promise<number | typeof API_ERROR> => {
-  let browser
-
-  browser = await playwright.chromium.launch({
+  const browser = await playwright.webkit.launch({
     headless: true,
   })
 
