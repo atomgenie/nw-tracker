@@ -1,5 +1,4 @@
-import type PlaywrightFullType from "playwright"
-import type PlaywrightCoreType from "playwright-aws-lambda"
+import playwright from "playwright"
 import microCors from "micro-cors"
 import randomstring from "randomstring"
 
@@ -15,30 +14,12 @@ async function waitAsync(ms: number) {
   })
 }
 
-let playwrightCorePromise: Promise<typeof PlaywrightCoreType> | undefined
-let playwrightFullPromise: Promise<typeof PlaywrightFullType> | undefined
-
-if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
-  playwrightCorePromise = import("playwright-aws-lambda")
-} else {
-  playwrightFullPromise = import("playwright")
-}
-
 export const getQueue = async (): Promise<number | typeof API_ERROR> => {
   let browser
 
-  if (process.env.AWS_LAMBDA_FUNCTION_NAME && playwrightCorePromise) {
-    const playwrightCore = await playwrightCorePromise
-
-    browser = await playwrightCore.launchChromium()
-  } else if (playwrightFullPromise) {
-    const playwrightFull = await playwrightFullPromise
-    browser = await playwrightFull.chromium.launch({
-      headless: true,
-    })
-  } else {
-    return -1
-  }
+  browser = await playwright.chromium.launch({
+    headless: true,
+  })
 
   const page = await browser.newPage()
   await page.goto("https://newworldstatus.com/")
