@@ -1,7 +1,7 @@
 import {NextApiHandler} from "next"
-import chrome from "chrome-aws-lambda"
-import puppeteerCore from "puppeteer-core"
-import puppeteerFull, {Browser} from "puppeteer"
+import chromium from "chrome-aws-lambda"
+import playwrightCore from "playwright-core"
+import playwrightFull from "playwright"
 
 const API_ERROR = "API_ERROR"
 
@@ -11,30 +11,20 @@ async function waitAsync(ms: number) {
   })
 }
 
-let puppeteer: any
-let isLambda = false
-
-if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-  // running on the Vercel platform.
-  puppeteer = puppeteerCore
-  isLambda = true
-} else {
-  // running locally.
-  puppeteer = puppeteerFull
-}
-
 export const getQueue = async (): Promise<number | typeof API_ERROR> => {
-  const browser: Browser = await puppeteer.launch(
-    isLambda
-      ? {
-          args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
-          defaultViewport: chrome.defaultViewport,
-          executablePath: await chrome.executablePath,
-          headless: true,
-          ignoreHTTPSErrors: true,
-        }
-      : undefined,
-  )
+  let browser
+
+  if (process.env.NODE_ENV !== "development") {
+    browser = await playwrightCore.chromium.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless,
+    })
+  } else {
+    browser = await playwrightFull.chromium.launch({
+      headless: true,
+    })
+  }
 
   const page = await browser.newPage()
   await page.goto("https://newworldstatus.com/")
