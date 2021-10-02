@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "playwright install",
+    "postinstall": "npx playwright install",
     "back": "ts-node -P ./back-tsconfig.json api/get_queue.ts"
   },
   "dependencies": {
