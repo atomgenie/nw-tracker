@@ -37,7 +37,7 @@ export const getQueue = async (): Promise<number | typeof API_ERROR> => {
 
   const page = await browser.newPage()
   await page.goto("https://newworldstatus.com/")
-  await waitAsync(8000)
+  await waitAsync(6000)
 
   const position = await page.evaluate(() => {
     const nodesAsgard = Array.from(document.querySelectorAll("strong")).filter(
