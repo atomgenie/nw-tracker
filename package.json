@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "back": "playwright install && ts-node -P ./back-tsconfig.json api/get_queue.ts"
+    "postinstall": "playwright install",
+    "back": "ts-node -P ./back-tsconfig.json api/get_queue.ts"
   },
   "dependencies": {
     "@types/micro": "^7.3.6",
