@@ -1,7 +1,7 @@
 import {NextApiHandler} from "next"
 import chromium from "chrome-aws-lambda"
-import playwrightCore from "playwright-core"
-import playwrightFull from "playwright"
+import type PlaywrightCoreType from "playwright-core"
+import type PlaywrightFullType from "playwright"
 
 const API_ERROR = "API_ERROR"
 
@@ -11,16 +11,22 @@ async function waitAsync(ms: number) {
   })
 }
 
+let playwrightCore: typeof PlaywrightCoreType | undefined
+let playwrightFull: typeof PlaywrightFullType | undefined
+
 export const getQueue = async (): Promise<number | typeof API_ERROR> => {
   let browser
 
   if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    playwrightCore = playwrightCore ?? (await import("playwright-core"))
+
     browser = await playwrightCore.chromium.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath,
       headless: chromium.headless,
     })
   } else {
+    playwrightFull = playwrightFull ?? (await import("playwright"))
     browser = await playwrightFull.chromium.launch({
       headless: true,
     })
