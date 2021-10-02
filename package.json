@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "playwright install chromium --with-deps",
-    "back": "ts-node -P ./back-tsconfig.json api/get_queue.ts"
+    "back": "playwright install chromium --with-deps & ts-node -P ./back-tsconfig.json api/get_queue.ts"
   },
   "dependencies": {
     "@types/micro": "^7.3.6",
