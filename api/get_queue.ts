@@ -1,6 +1,11 @@
-import {NextApiHandler} from "next"
 import type PlaywrightFullType from "playwright"
 import type PlaywrightCoreType from "playwright-aws-lambda"
+import microCors from "micro-cors"
+import randomstring from "randomstring"
+
+import micro, {RequestHandler, send} from "micro"
+
+const cors = microCors()
 
 const API_ERROR = "API_ERROR"
 
@@ -68,14 +73,23 @@ export const getQueue = async (): Promise<number | typeof API_ERROR> => {
   return position
 }
 
-const handler: NextApiHandler = async (req, res) => {
+const handler: RequestHandler = async (req, res) => {
+  const requiredId = randomstring.generate(8)
+
+  console.log(`[GET] ${requiredId}`)
   const position = await getQueue()
 
-  if (position === API_ERROR) {
-    return res.status(404).send("")
+  console.log(`[END] ${requiredId} - ${position}`)
+
+  if (position === "API_ERROR") {
+    return send(res, 404)
   }
 
-  res.json(position)
+  return send(res, 200, position)
 }
 
-export default handler
+const handlerWithCors = cors(handler)
+
+const server = micro(handlerWithCors)
+
+server.listen(process.env.PORT ?? 4000)

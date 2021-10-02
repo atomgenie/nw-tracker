@@ -2,7 +2,8 @@ import type {GetStaticProps, NextPage} from "next"
 import styled from "styled-components"
 import axios from "axios"
 import {useCallback, useEffect, useState} from "react"
-import {getQueue} from "./api/get_queue"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
 
 interface HomeProps {
   position: number | null
@@ -35,7 +36,7 @@ const Home: NextPage<HomeProps> = props => {
     setLoading(true)
 
     axios
-      .get<number>("/api/get_queue")
+      .get<number>(API_URL)
       .then(data => {
         const position = data.data
         setPosition(position)
@@ -70,15 +71,12 @@ const Home: NextPage<HomeProps> = props => {
 export default Home
 
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
-  let position: number | null
+  let position: number | null = null
 
-  const data = await getQueue()
-
-  if (data === "API_ERROR") {
-    position = null
-  } else {
-    position = data
-  }
+  try {
+    const data = await axios.get<number>(API_URL)
+    position = data.data
+  } catch {}
 
   return {
     props: {
