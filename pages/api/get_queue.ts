@@ -14,7 +14,7 @@ async function waitAsync(ms: number) {
 export const getQueue = async (): Promise<number | typeof API_ERROR> => {
   let browser
 
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
     browser = await playwrightCore.chromium.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath,
