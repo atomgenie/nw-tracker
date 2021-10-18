@@ -3,11 +3,7 @@ import styled from "styled-components"
 import axios from "axios"
 import {useCallback, useEffect, useState} from "react"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
-
-interface HomeProps {
-  position: number | null
-}
+interface HomeProps {}
 
 const StyledContainer = styled.div`
   height: 100%;
@@ -27,16 +23,14 @@ const StyledTimer = styled.div`
 `
 
 const Home: NextPage<HomeProps> = props => {
-  const {position: positionProps} = props
-
-  const [position, setPosition] = useState<number | undefined>(positionProps ?? undefined)
+  const [position, setPosition] = useState<number | undefined>()
   const [loading, setLoading] = useState(false)
 
   const fetchData = useCallback(() => {
     setLoading(true)
 
     axios
-      .get<number>(API_URL)
+      .get<number>("/api/get_queue")
       .then(data => {
         const position = data.data
         setPosition(position)
@@ -69,20 +63,3 @@ const Home: NextPage<HomeProps> = props => {
 }
 
 export default Home
-
-export const getStaticProps: GetStaticProps<HomeProps> = async () => {
-  let position: number | null = null
-
-  try {
-    const data = await axios.get<number>(API_URL)
-    position = data.data
-  } catch {}
-
-  return {
-    props: {
-      position,
-    },
-
-    revalidate: 60,
-  }
-}
