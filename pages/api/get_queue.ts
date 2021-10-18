@@ -60,7 +60,8 @@ export const getQueue = async (): Promise<number | API_ERROR> => {
     })
 
     return data.message.queue_current
-  } catch {
+  } catch (err) {
+    console.error(err)
     return {
       type: "API_ERROR",
       kind: "Error while making request",
