@@ -41,7 +41,8 @@ function memoizeCallApi<T extends any>(apiMethod: () => Promise<T>, timeout: num
 }
 
 export const getQueue = async (): Promise<number | API_ERROR> => {
-  console.log("Called")
+  const newWorldToken = getToken()
+
   try {
     const {data} = await axios.get<{
       success: true
@@ -55,7 +56,7 @@ export const getQueue = async (): Promise<number | API_ERROR> => {
       }
     }>(`https://firstlight.newworldstatus.com/ext/v1/worlds/asgard`, {
       headers: {
-        authorization: `Bearer ${getToken()}`,
+        authorization: `Bearer ${newWorldToken}`,
       },
     })
 
