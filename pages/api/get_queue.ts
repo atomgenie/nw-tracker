@@ -7,20 +7,23 @@ interface API_ERROR {
   kind: string
 }
 
-let apiToken: string | undefined
+let envMap: Partial<Record<string, string>> = {}
 
-function getToken() {
-  if (apiToken !== undefined) {
-    return apiToken
+function getEnv(env: string): string {
+  let envValue = envMap[env]
+
+  if (envValue !== undefined) {
+    return envValue
   }
 
-  apiToken = process.env.NEW_WORLD_TOKEN
+  envValue = process.env[env]
 
-  if (apiToken === undefined) {
-    throw new Error("Token invalid")
+  if (envValue === undefined) {
+    throw new Error(`Error: Env ${env} is undefined.`)
   }
 
-  return apiToken
+  envMap[env] = envValue
+  return envValue
 }
 
 function memoizeCallApi<T extends any>(apiMethod: () => Promise<T>, timeout: number) {
@@ -41,7 +44,8 @@ function memoizeCallApi<T extends any>(apiMethod: () => Promise<T>, timeout: num
 }
 
 export const getQueue = async (): Promise<number | API_ERROR> => {
-  const newWorldToken = getToken()
+  const newWorldToken = getEnv("NEW_WORLD_TOKEN")
+  const newWorldApiUrl = getEnv("NEW_WORLD_API")
 
   try {
     const {data} = await axios.get<{
@@ -54,9 +58,9 @@ export const getQueue = async (): Promise<number | API_ERROR> => {
         queue_wait_time_minutes: number
         status_enum: string
       }
-    }>(`https://firstlight.newworldstatus.com/ext/v1/worlds/asgard`, {
+    }>(`${newWorldApiUrl}/ext/v1/worlds/asgard`, {
       headers: {
-        authorization: `Bearer ${newWorldToken}`,
+        Authorization: `Bearer ${newWorldToken}`,
       },
     })
 
